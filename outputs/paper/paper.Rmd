@@ -1,0 +1,69 @@
+---
+title: "The Global Covid-19 Pandemic and Government Restrictions Response Change the Toronto Crime Type and Rate"
+author: "Chengle Yang"
+date: "April 1st, 2022"
+output: pdf_document
+subtitle: "A study on crime rate change from covid-19 with the City of Toronto's Open Data"
+toc: TRUE
+thanks: 'Code and data are available in this GitHub repository: [chle1999/Covid_Influence_Crime_Toronto](https://github.com/chle1999/Covid_Influence_Crime_Toronto).'
+bibliography: references.bib
+abstract: "This report presents a secondary analysis of the change of the City of Toronto's crime rate change from 2016 to 2020. The results indicate that Covid-19 Pandemic, neighborhood characteristics, age demographics, economic conditions,  and government restrictions policy could affect the occurrence number and types of Toronto's crime rate. The analysis consists of logistic regression performed with the statistical programming language R. The results contribute to our understanding of how to lower the crime rate, and help the Police department optimize the decision of crime elimination.
+ \\par
+ \\textbf {Keywords:} Covid-19, Toronto crime rate, city of Toronto neighborhood, crime type, open data toronto" 
+ 
+---
+
+```{r libraries, include = FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+# Load libraries
+library(here)
+library(janitor)
+library(kableExtra)
+library(knitr)
+library(opendatatoronto)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+```
+\newpage
+
+# Introduction
+background
+Crime rate is an important standard factor used to measure the safety of the city.  Its type and occurrence number rapidly change between 2019 and 2020 as the Covid-19 pandemic profoundly impacts Canada’s economy, health care system, and society. Government also enacted policies used to contain the spread of the virus, which also change people's lifestyles including socialization, learning, and working. Since March 2020, the majority of Canada’s population were spending more time at home. These changes bring an influence on the crime patterns across the country. Police-reported crime in Canada, as measured by the Crime Severity Index (CSI), decreased 8% from 79.8 in 2019 to 73.4 in 2020.[@statcan] And the total major crime indicators for Toronto decreased from 2019 to 2020, down about 14% from a rate of 1,332.1 occurrences per 100,000 people in 2019 to 1,146.5 per 100,000 people in 2020.[@esri] But how do all types of crime really decrease under the covid-19 pandemic and government lockdown policy? To answer this question, the following pages present a secondary analysis of survey data collected by the City of Toronto, about neighborhood crime rate change during 2019-2020.
+
+Althrough the overall decreasing trend seems pretty well, we want to focus on the detail change of distinct crime types. Accoring to Greg Moreau[@statcan], there were decreases in the rates of police-reported breaking and entering (-16%), theft of $5,000 or under (-20%), robbery (-18%), shoplifting of $5,000 or under (-36%), administration of justice violations (-17%) and sexual assault (level 1) (-9%). However, there exists unexpected increase in some of the crime types in Toronto. Toronto police report 151%, 222% jump in stunt driving charges and speeding tickets respectively,  compared to 2019. [@stunt_driving] And the attacks on Asian people have risen significantly across North America since the onset of the pandemic amid false allegations the virus was deliberately unleashed by China.[@hate_crimes] In order to solve corresponding issue, Toronto city council is asking the police services board to add more resources and officers to the Toronto Police Hate Crime Unit in response to an "unprecedented" rise in incidents of hatred in the city.[@police_support]
+
+Thus, the statistical support may be required for analyzing the crime rate change and used for the targeted crime eradication. 
+
+The paper first presents an overview of the original dataset and explains the essential variables inside and some key terminology and definitions. And it also describes the advantage and disadvantages of the collection methods of the dataset. Next, the Methodology section will talk about the strengths and weaknesses of the model used in analyzing the data. It includes details on how the data were re-coded to suit the model.  Then, the Result section will summarize and explains the results based on the visual figures and table which are modeled in the previous section. Finally,  the Discussion section will conclude the limitations and ethics of the research.
+
+To analyze the data in this report, the R statistical programming language(@R) will be applied. And the following packages are also required for extracting, cleaning, analyzing, and drawing data: here[@here], janitor[@janitor], kableExtra[@kableExtra], knitr[@knitr], opendatatoronto[@opendatatoronto], readxl[@readxl], tidyverse[@tidyverse], and ggplot2[@ggplot2].
+
+```{r, include = FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+# Import data
+
+```
+
+\newpage
+# Data
+
+# Methodology
+## Model
+
+# Results
+
+
+# Discussion
+
+
+## Findings
+
+
+## Ethics & Implications
+
+
+## Limitations & Future Work
+
+# Appendix
+
+\newpage
+# References
