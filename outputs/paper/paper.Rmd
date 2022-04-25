@@ -27,7 +27,18 @@ library(ggplot2)
 \newpage
 
 # Introduction
-background
+title changes:
+1.Title might be too long and needs to be tightened.
+2. Your topic chosen in interesting. It may be a good idea to make then title more intriguing by using rhetorical questions or metaphors.
+
+abstract changes:
+1. add why the topic you chose is essential.
+
+introduction changes:
+1.Greg Moreau[@statcan] mention genreal situation in canada, data is focus on trt
+2.specify the dataset.
+
+
 Crime rate is an important standard factor used to measure the safety of the city.  Its type and occurrence number rapidly change between 2019 and 2020 as the Covid-19 pandemic profoundly impacts Canada’s economy, health care system, and society. Government also enacted policies used to contain the spread of the virus, which also change people's lifestyles including socialization, learning, and working. Since March 2020, the majority of Canada’s population were spending more time at home. These changes bring an influence on the crime patterns across the country. Police-reported crime in Canada, as measured by the Crime Severity Index (CSI), decreased 8% from 79.8 in 2019 to 73.4 in 2020.[@statcan] And the total major crime indicators for Toronto decreased from 2019 to 2020, down about 14% from a rate of 1,332.1 occurrences per 100,000 people in 2019 to 1,146.5 per 100,000 people in 2020.[@esri] But how do all types of crime really decrease under the covid-19 pandemic and government lockdown policy? To answer this question, the following pages present a secondary analysis of survey data collected by the City of Toronto, about neighborhood crime rate change during 2019-2020.
 
 Althrough the overall decreasing trend seems pretty well, we want to focus on the detail change of distinct crime types. Accoring to Greg Moreau[@statcan], there were decreases in the rates of police-reported breaking and entering (-16%), theft of $5,000 or under (-20%), robbery (-18%), shoplifting of $5,000 or under (-36%), administration of justice violations (-17%) and sexual assault (level 1) (-9%). However, there exists unexpected increase in some of the crime types in Toronto. Toronto police report 151%, 222% jump in stunt driving charges and speeding tickets respectively,  compared to 2019. [@stunt_driving] And the attacks on Asian people have risen significantly across North America since the onset of the pandemic amid false allegations the virus was deliberately unleashed by China.[@hate_crimes] In order to solve corresponding issue, Toronto city council is asking the police services board to add more resources and officers to the Toronto Police Hate Crime Unit in response to an "unprecedented" rise in incidents of hatred in the city.[@police_support]
@@ -40,8 +51,112 @@ To analyze the data in this report, the R statistical programming language(@R) w
 
 ```{r, include = FALSE, echo=FALSE, message=FALSE, warning=FALSE}
 # Import data
+shelter_clean <- read_csv(here("inputs/data/clean_shelter_data.csv")) 
+```
+
+```{r}
+# read original data set from inputs
+covid_origin <- read_csv(paste(here(), "/inputs/data/COVID19_cases.csv", sep = "")) 
+crime_origin <- read_csv(paste(here(), "/inputs/data/Major_Crime_Indicators.csv", sep = ""))
+annual_crime_origin <- read_csv(paste(here(), "/inputs/data/Neighbourhood_Crime_Rates.csv", sep = "")) 
+
+# filter the annual_crime_origin by attractive topics of crime
+crime_types <- c("Assault", "AutoTheft", "BreakAndEnter", "Robbery", "TheftOver", "Homicide", "Shootings")
+filter1 <- vector()
+for (i in 1:length(crime_types)) {
+  for (j in 2014:2020) {
+    word <- paste(as.character(crime_types[i]), as.character(j), sep = "_")
+    filter1 <- filter1 %>% append(word)
+  }
+}
+annual_crime <- annual_crime_origin %>% subset(select = filter1) %>% colSums()
+fianal_annual_crime <- tibble(Year=(2014:2020))
+year_number = length((2014:2020))
+for (i in 1:length(crime_types)) {
+  tmp <- vector()
+  for (j in 1:year_number) {
+    number = 7*(i-1)+j
+    tmp <- tmp %>% append(annual_crime[number])
+  }
+  typeof(crime_types[i])
+  fianal_annual_crime <- fianal_annual_crime %>% mutate(tmp)
+  names(fianal_annual_crime)[names(fianal_annual_crime) == "tmp"] <- crime_types[i]
+}
+
+# filter the each month covid patients number from Jan 2020 to Dec 2021
+covid_number <- vector()
+months = c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
+for (i in 2020:2021) {
+  for (j in 1:length(months)) {
+    number <- covid_origin %>% filter(grepl(paste(i, months[j], sep="-"), `Episode Date`)) %>% count()
+    covid_number <- covid_number %>% append(number)
+  }
+}
+
+# the lock down policy include two stage: Mar 2020 to Jul 2021 and Dec 2020 to May 2021
+Lockdown <- c(rep("NO", 74), rep("YES", 5), rep("NO", 4), rep("YES", 6), rep("NO", 6), "YES")
+
+months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+
+# filter the crime_origin by specific crime types(BreakAndEnter, Assault, AutoTheft) and years(2014:2021)
+# filter the BreakAndEnter and combine covid data and lockdown data
+BreakAndEnter <- tibble("Months"=(1:96))
+Number <- vector()
+for (i in 2014:2021) {
+  for (j in 1:length(months)) {
+    number <- crime_origin %>% filter(grepl("Break and Enter", `MCI`) | grepl("BreakAndEnter", `MCI`)) %>% filter(occurrenceyear == i & occurrencemonth == months[j]) %>% count()
+    Number <- Number %>% append(number)
+  }
+}
+BreakAndEnter <- BreakAndEnter %>% mutate(Number) %>% mutate(Covid=c(rep(0, 72), covid_number)) %>% mutate(Lockdown)
+
+# filter the Assault and combine covid data and lockdown data
+Assault <- tibble("Months"=(1:96))
+Number <- vector()
+for (i in 2014:2021) {
+  for (j in 1:length(months)) {
+    number <- crime_origin %>% filter(grepl("Assault", `MCI`)) %>% filter(occurrenceyear == i & occurrencemonth == months[j]) %>% count()
+    Number <- Number %>% append(number)
+  }
+}
+Assault <- Assault %>% mutate(Number) %>% mutate(Covid=c(rep(0, 72), covid_number)) %>% mutate(Lockdown)
+
+# filter the AutoTheft and combine covid data and lockdown data
+AutoTheft <- tibble("Months"=(1:96))
+Number <- vector()
+for (i in 2014:2021) {
+  for (j in 1:length(months)) {
+    number <- crime_origin %>% filter(grepl("Auto", `MCI`)) %>% filter(occurrenceyear == i & occurrencemonth == months[j]) %>% count()
+    Number <- Number %>% append(number)
+  }
+}
+AutoTheft <- AutoTheft %>% mutate(Number) %>% mutate(Covid=c(rep(0, 72), covid_number)) %>% mutate(Lockdown)
+
+# save the df to csv files
+data_names <- c("fianal_annual_crime", "BreakAndEnter", "Assault", "AutoTheft")
+for (i in 1:length(data_names)) {
+write.csv(eval(as.symbol(data_names[i])), paste(here(), "/outputs/data/", data_names[i], ".csv", sep = ""), row.names = FALSE)}
 
 ```
+
+```{r}
+# draw graph of annual crime number from 2014 to 2020
+ggplot(fianal_annual_crime, aes(x=Year)) + 
+  geom_line(aes(y = as.numeric(Assault), colour = "Assault", group = 1)) + 
+  geom_line(aes(y = as.numeric(AutoTheft), colour = "AutoTheft", group = 1)) +
+  geom_line(aes(y = as.numeric(BreakAndEnter), colour = "BreakAndEnter", group = 1)) + 
+  geom_line(aes(y = as.numeric(Robbery), colour = "Robbery", group = 1)) +
+  geom_line(aes(y = as.numeric(TheftOver), colour = "TheftOver", group = 1)) +
+  geom_line(aes(y = as.numeric(Homicide), colour = "Homicide", group = 1)) + 
+  geom_line(aes(y = as.numeric(Shootings), colour = "Shootings", group = 1)) +
+  labs(x="Year", y="Number of Crime in Toronto") + 
+  ggtitle("Number of Crime in Toronto Separated By Crime Types") +
+  theme(plot.title = element_text(size=8, hjust=0.5)) +
+  theme_minimal() + 
+  theme(legend.position="bottom") +
+  labs(caption = "Figure1 created by Chengle Yang in STA304, Winter 2022")
+```
+obvious: BreakAndEnter(decrease) & Assault(decrease) & AutoTheft(increase)
 
 \newpage
 # Data
